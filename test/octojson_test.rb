@@ -81,7 +81,7 @@ class OctojsonTest < ActiveSupport::TestCase
         :text_one, 
         :boolean_one, 
         :number_one, 
-        { :json_one=> [:nested_one, :nested_two, :nested_three] }
+        { :json_one => [:nested_one, :nested_two, :nested_three] }
       ]
   end
 
@@ -93,5 +93,44 @@ class OctojsonTest < ActiveSupport::TestCase
   test 'invalid when settings attribute out of range' do
     post = Post.new(post_type: 'type_one', settings: { number_one: 99 })
     assert_equal post.valid?, false
+  end
+
+  test 'apply defaults when default case on initialize' do
+    post = Post.new()
+    assert_equal post.options['title'], 'default title'
+    assert_equal post.options['number_default'], 3
+    assert_equal post.options['sub_options'], []
+  end
+
+  test 'invalid when default case' do
+    post = Post.new(options: { number_default: 99 })
+    assert_equal post.valid?, false
+  end
+
+  test 'default case with array of objects' do
+    post = Post.new(options: { sub_options: [{
+        id: "test",
+        name: "name 1",
+        type: "type 1"
+      },
+      {
+        id: "test 2",
+        other: false,
+        name: "name 2",
+        type: "type 2"
+      }] 
+    })
+    assert_equal post.options['sub_options'], [{"name"=>"name 1", "type"=>"type 1"}, {"name"=>"name 2", "type"=>"type 2"}]
+  end
+
+  test '#{json_attribute}_strong_params for default' do
+    post = Post.new
+    post.save
+
+    assert_equal post.options_strong_params, [
+      :title,
+      :number_default,
+      { :sub_options => [:name, :type] }
+    ]
   end
 end

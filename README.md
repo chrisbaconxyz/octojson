@@ -7,7 +7,7 @@ Supercharge `jsonb` attributes with defaults and schemas based on another `Activ
 Add to your Gemfile:
 
 ```ruby 
-gem 'octojson', git: 'git://github.com/baconck/octojson.git'
+gem 'octojson'
 ```
 
 Then you can add `octojson` to your model(s):
@@ -68,6 +68,22 @@ class Post < ActiveRecord::Base
   }.freeze
 
   octojson :settings, YOUR_SCHEMA, :post_type
+end
+```
+
+Sometimes you don't need support for different attributes values. `_default` can be used instead to get the benefits of a schema with defaults and enforced nested_attributes.
+
+```ruby
+class Post < ActiveRecord::Base
+  OPTIONS_SCHEMA_AS_DEFAULT = { 
+    _default: {
+      title: { type: :string, default: 'default title' },
+      number_default: { type: :integer, default: 3, validates: { numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 } } },
+      sub_options: { type: :array, default: [], nested_attributes: [:name, :type] }
+    }
+  }.freeze
+
+  octojson :options, OPTIONS_SCHEMA_AS_DEFAULT
 end
 ```
 

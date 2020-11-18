@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 2020_04_07_031737) do
   create_table "posts", force: :cascade do |t|
     t.string "post_type"
     t.jsonb "settings"
+    t.jsonb "options"
   end
 
 end

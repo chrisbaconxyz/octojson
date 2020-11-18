@@ -18,5 +18,14 @@ class Post < ActiveRecord::Base
     }
   }.freeze
 
+  OPTIONS_SCHEMA_AS_DEFAULT = { 
+    _default: {
+      title: { type: :string, default: 'default title' },
+      number_default: { type: :integer, default: 3, validates: { numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 } } },
+      sub_options: { type: :array, default: [], nested_attributes: [:name, :type] }
+    }
+  }.freeze
+
   octojson :settings, SCHEMA, :post_type
+  octojson :options, OPTIONS_SCHEMA_AS_DEFAULT
 end
